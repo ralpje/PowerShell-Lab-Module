@@ -5,8 +5,16 @@
       Creates a new VM in the lab environment
       .DESCRIPTION
       Creates a new VM in the lab environment. Takes the name and IP-address of the VM as a parameter.
-      IP-address must be in the 192.168.0.1/24 notation. The specification of a DNS-server is optional.
-      If DNS-server is not specified, the default will be used. 
+      IP-address must be in the 192.168.0.1/24 notation. The specification of a DNS-server and gateway is optional.
+      If DNS-server or gateway is not specified, the default will be used. 
+      .PARAMETER VMName
+      Specifies the name for the newly created VM, both as VM Name in Hyper-V and as hostname.
+      .PARAMETER VMIP
+      Specifies the IP-address for the newly created VM.
+      .PARAMETER DNSIP
+      Specifies the IP to use as DNS server in the newly created VM. If not specified, the default will be used.
+      .PARAMETER GWIP
+      Specifies the IP to use as gateway for the newly created VM. If not specified, the default will be used. 
       .EXAMPLE
       New-LabVM -VMName HOSTNAME -VMIP 10.0.0.18/29
       .EXAMPLE
