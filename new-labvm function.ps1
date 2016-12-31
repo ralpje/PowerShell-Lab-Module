@@ -32,21 +32,21 @@
     
     [Parameter(Position=2)]
     [string]
-    $DNSIP = '172.16.0.200',
+    $DNSIP = '8.8.8.8',
 
     [Parameter(Position=3)]
     [string]
-    $GWIP = '172.16.0.1'
+    $GWIP = '172.16.10.1'
   )
   
   #region define variables
     
     # Script Variables that are the same for each server
     # Adjust these variables according to your environment
-    $diskpath = "D:\$VMName.vhdx"
-    $ParentDisk = 'G:\SoftwareLib\VHD Templates\W2K16_Template.vhdx'
-    $VMSwitch = 'NATnetwork'
-    $SourceXML = 'G:\GitHub\private\unattend.xml'
+    $diskpath = "C:\vhdx\$VMName.vhdx"
+    $ParentDisk = 'C:\vhdx\W2K16_Template.vhdx'
+    $VMSwitch = 'NATswitch'
+    $SourceXML = 'C:\Users\SvenvanRijen\Documents\GitHub\Experts-Live-2016\unattend.xml'
   #endregion
   
   #region create diff disk
