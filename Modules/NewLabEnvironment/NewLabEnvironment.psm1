@@ -123,6 +123,9 @@ function New-LabVM
 
     [Parameter(Mandatory = $false)]
     [string]$SourceXML = "$PSScriptRoot\temp\unattended.xml",
+    
+    [Parameter(Mandatory = $false)]
+    [string]$AzureDSC = $false,
 
     [Parameter(Mandatory = $false)]
     [string]$MemoryStartupBytes = 2048MB
@@ -180,6 +183,25 @@ function New-LabVM
     Write-Verbose -Message "Set VM name to $VMName, IP Address to $VMIP, DNS IP to $DNSIP and GW IP to $GWIP"    
     
     Start-Sleep -Seconds 2
+    
+    if ($AzureDSC -eq $true)
+    {
+        # Copy AzureDSC.ps1 to VHD
+        $sourceps1 = 'E:\github\private\AzureDSC.ps1'
+        $destps1 = "${VHD}:\\AzureDSC.ps1"
+        Copy-Item -Path $sourceps1 -Destination $destps1
+        
+        # Set script to run once
+        Set-Location -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+        Set-ItemProperty -Path . -Name CreateDomain -Value "C:\AzureDSC.ps1"
+        
+        # Start LCM with generated config
+        Set-DscLocalConfigurationManager -Path C:\dsc\DscMetaConfigs -ComputerName $env:hostname
+        
+        
+    
+      Write-Verbose -Message "Unattended.xml copied from GitHub to $PSScriptRoot\Temp."
+    }
     
     # dismount VHD
     Dismount-VHD $maindiskpath
