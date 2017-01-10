@@ -187,20 +187,17 @@ function New-LabVM
     if ($AzureDSC -eq $true)
     {
         # Copy AzureDSC.ps1 to VHD
-        $sourceps1 = 'E:\github\private\AzureDSC.ps1'
-        $destps1 = "${VHD}:\\AzureDSC.ps1"
+        $sourceps1 = 'G:\GitHub\private\MetaConfig.mof'
+        $destps1 = "${VHD}:\\Windows\system32\Configuration\MetaConfig.mof"
         Copy-Item -Path $sourceps1 -Destination $destps1
+
+        reg load HKLM\Vhd ${VHD}:\Windows\System32\Config\Software
+        Set-Location HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies
+        Set-ItemProperty -Path . -Name DSCAutomationHostEnabled -Value 2
+        [gc]::Collect()
+        reg unload HKLM\Vhd
         
-        # Set script to run once
-        Set-Location -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
-        Set-ItemProperty -Path . -Name CreateDomain -Value "C:\AzureDSC.ps1"
-        
-        # Start LCM with generated config
-        Set-DscLocalConfigurationManager -Path C:\dsc\DscMetaConfigs -ComputerName $env:hostname
-        
-        
-    
-      Write-Verbose -Message "Unattended.xml copied from GitHub to $PSScriptRoot\Temp."
+        Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
     }
     
     # dismount VHD
