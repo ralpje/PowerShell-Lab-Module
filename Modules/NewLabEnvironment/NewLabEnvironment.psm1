@@ -187,7 +187,7 @@ function New-LabVM
     if ($AzureDSC -eq $true)
     {
       # Copy AzureDSC.ps1 to TEMP
-      $sourceps1 = 'C:\users\SvenvanRijen\Documents\GitHub\private\AzureDSC.ps1'
+      $sourceps1 = 'G:\GitHub\private\AzureDSC.ps1'
       $destps1 = "$PSScriptRoot\temp\AzureDSC.ps1"
       Copy-Item -Path $sourceps1 -Destination $destps1
       Set-Location -Path "$PSScriptRoot\temp\"
@@ -200,7 +200,7 @@ function New-LabVM
         
         
       $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
-      $destmof = "E:\Windows\system32\Configuration\MetaConfig.mof"
+      $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
       Copy-Item -Path $sourcemof -Destination $destmof -Force
 
       reg.exe load HKLM\Vhd ${VHD}:\Windows\System32\Config\Software
