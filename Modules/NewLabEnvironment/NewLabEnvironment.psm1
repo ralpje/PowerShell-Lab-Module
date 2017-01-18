@@ -125,7 +125,7 @@ function New-LabVM
     [string]$SourceXML = "$PSScriptRoot\temp\unattended.xml",
     
     [Parameter(Mandatory = $false)]
-    [string]$AzureDSC = $false,
+    [string]$url = 'https://raw.githubusercontent.com/svenvanrijen/linkedmodulefiles/master/unattend.xml',
 
     [Parameter(Mandatory = $false)]
     [string]$MemoryStartupBytes = 2048MB
@@ -139,7 +139,7 @@ function New-LabVM
     #region create diff disk
     # Create new differencing disk
     
-    $maindiskpath = "$diskpath$VMName.vhdx"
+    $maindiskpath = "$diskpath\$VMName.vhdx"
     
     New-VHD -ParentPath $ParentDisk -Path $maindiskpath -Differencing
     
@@ -161,8 +161,7 @@ function New-LabVM
     
     Start-Sleep -Seconds 2
     
-    # Copy xml from github to local temp dir
-    $url = 'https://raw.githubusercontent.com/svenvanrijen/linkedmodulefiles/master/unattend.xml'
+    # Copy xml from github to local temp dir    
     New-Item -ItemType Directory -Path "$PSScriptRoot\Temp" -Force
     $output = "$PSScriptRoot\temp\unattended.xml"
     Invoke-WebRequest -Uri $url -OutFile $output
@@ -183,34 +182,6 @@ function New-LabVM
     Write-Verbose -Message "Set VM name to $VMName, IP Address to $VMIP, DNS IP to $DNSIP and GW IP to $GWIP"    
     
     Start-Sleep -Seconds 2
-    
-    if ($AzureDSC -eq $true)
-    {
-      # Copy AzureDSC.ps1 to TEMP
-      $sourceps1 = 'G:\GitHub\private\AzureDSC.ps1'
-      $destps1 = "$PSScriptRoot\temp\AzureDSC.ps1"
-      Copy-Item -Path $sourceps1 -Destination $destps1
-      Set-Location -Path "$PSScriptRoot\temp\"
-        
-      #Edit AzureDSC.ps1 so it will contain the right node-name ($vmname)
-      (Get-Content -Path '.\AzureDSC.ps1') -replace '\breplace\b', "$VMName" | Out-File -FilePath '.\AzureDSC.ps1'
-        
-      #Kick off AzureDSC.ps1 to generate metamof
-      Invoke-Expression -Command '.\AzureDSC.ps1'
-        
-        
-      $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
-      $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
-      Copy-Item -Path $sourcemof -Destination $destmof -Force
-
-      reg.exe load HKLM\Vhd ${VHD}:\Windows\System32\Config\Software
-      Set-Location -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies
-      Set-ItemProperty -Path . -Name DSCAutomationHostEnabled -Value 2
-      [gc]::Collect()
-      reg.exe unload HKLM\Vhd
-        
-      Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
-    }
     
     # dismount VHD
     Dismount-VHD $maindiskpath
