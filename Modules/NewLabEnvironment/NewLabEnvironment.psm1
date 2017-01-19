@@ -123,6 +123,9 @@ function New-LabVM
 
     [Parameter(Mandatory = $false)]
     [string]$SourceXML = "$PSScriptRoot\temp\unattended.xml",
+    
+    [Parameter(Mandatory = $false)]
+    [string]$url = 'https://raw.githubusercontent.com/svenvanrijen/linkedmodulefiles/master/unattend.xml',
 
     [Parameter(Mandatory = $false)]
     [string]$MemoryStartupBytes = 2048MB
@@ -158,8 +161,7 @@ function New-LabVM
     
     Start-Sleep -Seconds 2
     
-    # Copy xml from github to local temp dir
-    $url = 'https://raw.githubusercontent.com/svenvanrijen/linkedmodulefiles/master/unattend.xml'
+    # Copy xml from github to local temp dir    
     New-Item -ItemType Directory -Path "$PSScriptRoot\Temp" -Force
     $output = "$PSScriptRoot\temp\unattended.xml"
     Invoke-WebRequest -Uri $url -OutFile $output
