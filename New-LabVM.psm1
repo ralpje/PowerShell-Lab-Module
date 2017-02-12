@@ -1,74 +1,4 @@
-﻿#requires -Version 3.0 -Modules Hyper-V, NetAdapter, NetNat, NetTCPIP, Storage
-
-<#
-    .Synopsis
-    This module lets you roll out your lab environment automatically. This is the first step: creating a NATSwitch.
-
-    .DESCRIPTION
-    This module lets you roll out your lab environment automatically as described in our blogs (www.365dude.nl and www.svenvanrijen.nl).
-    This is the first step: creating a NATSwitch.
-
-    The Name parameter is mandatory.
-    IP Address is optional, "172.16.10.1" is the default value.
-    Prefix Length is optional, "24" is the default value.
-    NAT name is optional, "LABnat" is the default value.
-
-    .EXAMPLE
-    You first have to create a NATSwitch, before creating any VM's in your lab.
-
-    New-NATswitch -Name NATswitch creates a NATswitch with the default IP Address (172.16.10.1), Prefix Length (24)
-    and NAT name (LABnat)
-
-    .EXAMPLE
-    New-NATSwitch -Name Test -IPAddress 10.0.1.1 -PrefixLength 24 -NATName TestNAT
-
-    With this line of code you create a new VMSwitch within HyperV with the name Test. 
-    Also an IP Address (10.0.1.1) is assigned to this switch and a NAT network with address space 10.0.1.0/24 
-    is created.
-#>
-function New-NATSwitch
-{
-  [CmdletBinding()]
-  [OutputType([String])]
-  Param
-  ( 
-    [Parameter(Mandatory = $true)]
-    [string]$Name,
-        
-    [Parameter(Mandatory = $false)]
-    [string]$IPAddress = 172.16.10.1,
-        
-    [Parameter(Mandatory = $false)]
-    [int]$PrefixLength = 24,
-        
-    [Parameter(Mandatory = $false)]
-    [string]$NATName = 'LabNAT'
-  )
-
-  Begin
-  {
-  }
-  Process
-  {
-        
-    New-VMSwitch -SwitchName $Name -SwitchType Internal
-
-    $NetAdapter = Get-NetAdapter -Name "vEthernet ($Name)"
-    $InterfaceIndex = $NetAdapter.ifIndex
-          
-    New-NetIPAddress -IPAddress $IPAddress -PrefixLength $PrefixLength -InterfaceIndex $InterfaceIndex
-          
-    $ip2 = $IPAddress.Split('.')
-    $ip2[-1] = "0/$PrefixLength"
-    $InternalIPInterfaceAddressPrefix = $ip2 -join '.'
-
-    New-NetNat -Name $NATName -InternalIPInterfaceAddressPrefix $InternalIPInterfaceAddressPrefix 
-                  
-  }
-  End
-  {
-  }
-}
+﻿# Version 2.0 (12-02-2017)
 
 <#
     .Synopsis
@@ -76,7 +6,7 @@ function New-NATSwitch
 
     .DESCRIPTION
     This module lets you roll out your lab environment automatically as described in our blogs (www.365dude.nl and www.svenvanrijen.nl).
-    This is the second step: creating a Lab VM's.
+    This is the second step: creating Lab VM's.
     First step: creating a NATSwitch (New-NATSwitch).
 
     New-LabVM generates a new VM in the lab environment. 
@@ -84,6 +14,8 @@ function New-NATSwitch
     Please use the same address space as used when creating the NATSwitch.
     The specification of a Gateway is optional. If DNS-server is not specified, the default will be used. (172.16.10.1)
     The specification of a DNS-server is optional. If DNS-server is not specified, the default will be used. (8.8.8.8)
+
+    For more information or help regarding this module, please visit the GitHub repo: https://github.com/ralpje/PowerShell-Lab-Module
 
     .EXAMPLE
     New-LabVM -VMName Test -VMIP 10.0.0.18/29 -GWIP 10.0.0.1
@@ -99,6 +31,9 @@ function New-LabVM
   ( 
     [Parameter(Mandatory = $true)]
     [string]$VMName,
+    
+    [Parameter(Mandatory = $false)]
+    [string]$MemoryStartupBytes = 2048MB,
         
     [Parameter(Mandatory = $true)]
     [string]$VMIP,
@@ -107,7 +42,7 @@ function New-LabVM
     [string]$GWIP = '172.16.10.1',
 
     [Parameter(Mandatory = $true)]
-    [string]$diskpath,
+    [string]$Diskpath,
 
     [Parameter(Mandatory = $true)]
     [string]$ParentDisk,
@@ -117,18 +52,18 @@ function New-LabVM
         
     [Parameter(Mandatory = $false)]
     [string]$DNSIP = '8.8.8.8',
-        
+             
     [Parameter(Mandatory = $false)]
-    [string]$NATName = 'LabNAT',
-
-    [Parameter(Mandatory = $false)]
-    [string]$SourceXML = "$PSScriptRoot\temp\unattended.xml",
+    [string]$Unattendloc = 'https://raw.githubusercontent.com/ralpje/PowerShell-Lab-Module/Templates/unattend.xml',
     
     [Parameter(Mandatory = $false)]
-    [string]$url = 'https://raw.githubusercontent.com/svenvanrijen/linkedmodulefiles/master/unattend.xml',
+    [boolean]$DSC = $false,
 
     [Parameter(Mandatory = $false)]
-    [string]$MemoryStartupBytes = 2048MB
+    [string]$DSCPullConfig,
+    
+    [Parameter(Mandatory = $false)]
+    [boolean]$NestedVirt 
   )
 
   Begin
@@ -139,7 +74,7 @@ function New-LabVM
     #region create diff disk
     # Create new differencing disk
     
-    $maindiskpath = "$diskpath\$VMName.vhdx"
+    $maindiskpath = "$diskpath$VMName.vhdx"
     
     New-VHD -ParentPath $ParentDisk -Path $maindiskpath -Differencing
     
@@ -161,15 +96,16 @@ function New-LabVM
     
     Start-Sleep -Seconds 2
     
-    # Copy xml from github to local temp dir    
+    # Copy xml from source to local temp dir
     New-Item -ItemType Directory -Path "$PSScriptRoot\Temp" -Force
     $output = "$PSScriptRoot\temp\unattended.xml"
-    Invoke-WebRequest -Uri $url -OutFile $output
+    Invoke-WebRequest -Uri $unattendloc -OutFile $output
     
-    Write-Verbose -Message "Unattended.xml copied from GitHub to $PSScriptRoot\Temp."
+    Write-Verbose -Message "Unattended.xml copied from $unattendloc to $PSScriptRoot\Temp."
     
     Start-Sleep -Seconds 2
     
+    $SourceXML = "$PSScriptRoot\temp\unattended.xml"
     
     # add XML Content
     [xml]$Unattend = Get-Content $SourceXML
@@ -183,8 +119,38 @@ function New-LabVM
     
     Start-Sleep -Seconds 2
     
+    if ($DSC -eq $true)
+    {
+      # Copy DSC Pull Config to TEMP
+      $destps1 = "$PSScriptRoot\temp\DSCPullConfig.ps1"
+      Copy-Item -Path $DSCPullConfig -Destination $destps1
+      Set-Location -Path "$PSScriptRoot\temp\"
+        
+      #Edit DSC Pull Config so it will contain the right node-name ($vmname)
+      (Get-Content -Path '.\DSCPullConfig.ps1') -replace '\breplace\b', "$VMName" | Out-File -FilePath '.\DSCPullConfig.ps1'
+        
+      #Kick off DSC Pull Config to generate metamof
+      Invoke-Expression -Command '.\DSCPullConfig.ps1'
+             
+      $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
+      $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
+      Copy-Item -Path $sourcemof -Destination $destmof -Force
+
+      Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
+      
+      reg.exe load HKLM\Vhd ${VHD}:\Windows\System32\Config\Software
+      Set-Location -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies
+      Set-ItemProperty -Path . -Name DSCAutomationHostEnabled -Value 2
+      [gc]::Collect()
+      reg.exe unload HKLM\Vhd
+        
+      Write-Verbose -Message "Enabled DSC Automation Host on $VMName."
+    }
+    
     # dismount VHD
     Dismount-VHD $maindiskpath
+
+    Write-Verbose -Message 'Differencing disk dismounted'
     #endregion
   
     #region create new vm
@@ -192,15 +158,27 @@ function New-LabVM
     New-VM -Name $VMName -MemoryStartupBytes $MemoryStartupBytes -SwitchName $VMSwitch -VHDPath $maindiskpath -Generation 2 -BootDevice VHD
     #endregion
     
-    Write-Verbose -Message "Created new lab VM with name $VMName, $MemoryStartupBytes memory. The VM is connected to $NATName with IP address $VMIP."
+    Write-Verbose -Message "Created new lab VM with name $VMName, $MemoryStartupBytes memory. The VM is connected to $VMSwitch with IP address $VMIP."
     
     Start-Sleep -Seconds 2
+    
+    if ($NestedVirt -eq $true)
+    {
+      Set-VMProcessor -VMName $VMName -ExposeVirtualizationExtensions $true
+    
+      Write-Verbose -Message "Exposed Virtualization Extensions on $VMName."
+    }
   
     #region start new vm and connect to console
     # Start VM
     Start-VM $VMName
     Start-Process -FilePath vmconnect -ArgumentList localhost, $VMName
-    #endregion                  
+
+    Write-Verbose -Message "Started $VMName."
+
+    #endregion 
+    
+    Set-Location -Path c:\                
   }
   End
   {
