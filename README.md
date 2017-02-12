@@ -22,7 +22,7 @@ This module is extending the script I first used for my Experts Live 2016 sessio
 * **MemoryStartupBytes:** (String, default value: 2048MB) Specifies the amount of internal memory of the new VM.  
 * **VMIP:** (Mandatory, String) Specifies the IP Address of the new VM.
 * **GWIP:** (String, default value 172.16.10.1) Specifies the default gateway IP address of the new VM. Default value matches the default value of the IP address of the New-NATSwitch resource.
-* **Diskpath:** (Mandatory, String) Specifies the path where the differencing vhdx-file for the new Lab VM should be created. Points to a new .vhdx-file.
+* **Diskpath:** (Mandatory, String) Specifies the path where the differencing vhdx-file for the new Lab VM should be created. Points to a directory path.
 * **ParentDisk:** (Mandatory, String) Specifies the path where the 'Main' OS Disk, source for the differencing disk, can be found. Points to an existing .vhdx-file.
 * **VMSwitch:** (Mandatory, String) Specifies the name of the Virtual Switch where the new VM will be connected with.
 * **DNSIP:** (String, default value = 8.8.8.8) Specifies the IP address of the DNS server the VM will be configured with.
