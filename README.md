@@ -26,7 +26,7 @@ This module is extending the script I first used for my Experts Live 2016 sessio
 * **ParentDisk:** (Mandatory, String) Specifies the path where the 'Main' OS Disk, source for the differencing disk, can be found. Points to an existing .vhdx-file.
 * **VMSwitch:** (Mandatory, String) Specifies the name of the Virtual Switch where the new VM will be connected with.
 * **DNSIP:** (String, default value = 8.8.8.8) Specifies the IP address of the DNS server the VM will be configured with.
-* **Unattendloc:** (String, default value: https://raw.githubusercontent.com/ralpje/PowerShell-Lab-Module/Templates/unattend.xml) Specifies the location where the unattend.xml-file can be found which will be used during the creation of the new VM.
+* **Unattendloc:** (String, default value: https://raw.githubusercontent.com/ralpje/PowerShell-Lab-Module/master/Templates/unattend.xml) Specifies the location where the unattend.xml-file can be found which will be used during the creation of the new VM.
 * **DSC:** (Boolean, default value: $false) Setting DSC to true, the new VM will try to register itself at the in the specified URL within the DSCPullConfig-file.
 * **DSCPullConfig:** (Mandatory when DSC = $true, String) Specifies the settings for the local DSC Manager config of the new VM, so it can connect to the right (Azure) DSC Pull Server.
 * **NestedVirt:** (Boolean, default value: $false) Nested virtualization is a feature that allows you to run Hyper-V inside of a Hyper-V virtual machine. In other words, with nested virtualization, a Hyper-V host itself can be virtualized. Setting NestedVirt to true, this feature will be enabled for the lab VM.
@@ -249,6 +249,11 @@ This module is extending the script I first used for my Experts Live 2016 sessio
  ```
  
 ## Versions
+
+### v2.1 (13-02-2017)
+
+* New-LabVM
+    * Fixed a bug regarding the default unattend.xml location on GitHub.
 
 ### v2.0 (12-02-2017)
 

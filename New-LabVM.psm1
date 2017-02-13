@@ -54,7 +54,7 @@ function New-LabVM
     [string]$DNSIP = '8.8.8.8',
              
     [Parameter(Mandatory = $false)]
-    [string]$Unattendloc = 'https://raw.githubusercontent.com/ralpje/PowerShell-Lab-Module/Templates/unattend.xml',
+    [string]$Unattendloc = 'https://raw.githubusercontent.com/ralpje/PowerShell-Lab-Module/master/Templates/unattend.xml',
     
     [Parameter(Mandatory = $false)]
     [boolean]$DSC = $false,
