@@ -257,7 +257,7 @@ This module is extending the script I first used for my Experts Live 2016 sessio
 
 ### v2.0 (12-02-2017)
 
-Splitted up NewLabEnvironment into New-NATSwitch and New-LabVM.
+Split up NewLabEnvironment into New-NATSwitch and New-LabVM.
 
 * New-NATSwitch
     * New file, separated from New-LabVM.

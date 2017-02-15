@@ -1,4 +1,4 @@
-﻿ # The DSC configuration that will generate metaconfigurations
+﻿# The DSC configuration that will generate metaconfigurations
  [DscLocalConfigurationManager()]
  Configuration DscMetaConfigs
  {
@@ -90,20 +90,19 @@
  # Create the metaconfigurations
  # TODO: edit the below as needed for your use case
  $Params = @{
-     RegistrationUrl = '<your-registration-url-here>';
-     RegistrationKey = '<your-registration-key-here>';
-     ComputerName = "replace";
-     NodeConfigurationName = "<your-node-config-name-here>";
+     RegistrationUrl = '<fill me in>';
+     RegistrationKey = '<fill me in>';
+     ComputerName = @('<some VM to onboard>', '<some other VM to onboard>');
+     NodeConfigurationName = 'SimpleConfig.replace';
      RefreshFrequencyMins = 30;
      ConfigurationModeFrequencyMins = 15;
-     RebootNodeIfNeeded = $True;
+     RebootNodeIfNeeded = $False;
      AllowModuleOverwrite = $False;
-     ConfigurationMode = 'ApplyAndAutoCorrect';
+     ConfigurationMode = 'ApplyAndMonitor';
      ActionAfterReboot = 'ContinueConfiguration';
      ReportOnly = $False;  # Set to $True to have machines only report to AA DSC but not pull from it
  }
 
  # Use PowerShell splatting to pass parameters to the DSC configuration being invoked
  # For more info about splatting, run: Get-Help -Name about_Splatting
- 
  DscMetaConfigs @Params
