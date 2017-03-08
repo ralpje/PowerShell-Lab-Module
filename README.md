@@ -250,6 +250,11 @@ This module is extending the script I first used for my Experts Live 2016 sessio
  
 ## Versions
 
+### v2.2 (08-03-2017)
+
+* New-LabVM
+    * Fixed a bug regarding copying the metamof file to the mounted VHD. This would give an error when the new LabVM was deployed with Server 2016, due to insufficient rights on the target folder.
+
 ### v2.1 (13-02-2017)
 
 * New-LabVM
