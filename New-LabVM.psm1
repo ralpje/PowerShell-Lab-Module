@@ -1,4 +1,4 @@
-﻿# Version 2.0 (12-02-2017)
+﻿# Version 2.2 (08-03-2017)
 
 <#
     .Synopsis
@@ -133,7 +133,9 @@ function New-LabVM
       Invoke-Expression -Command '.\DSCPullConfig.ps1'
              
       $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
+      $destdir = "${VHD}:\Windows\system32\Configuration"
       $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
+      takeown.exe /F $destdir
       Copy-Item -Path $sourcemof -Destination $destmof -Force
 
       Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
