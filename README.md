@@ -3,6 +3,51 @@ A Powershell module for (re)building your (home) lab environment on Hyper-V
 
 This module is extending the script I first used for my Experts Live 2016 session about this topic.
 
+## Versions
+
+## V2.3 (22-03-2017)
+
+* New-LabVM
+    * Fixed a bug regarding MemoryStartupBytes. Input type is `int64` instead of `string`.
+    * Fixed a bug regarding copying the metamof file to the mounted VHD. This would give an error when the new LabVM was deployed with Server 2016, due to insufficient rights on the target folder. Fix in V2.2 didn't work out as expected.
+
+### v2.2 (08-03-2017)
+
+* New-LabVM
+    * Fixed a bug regarding copying the metamof file to the mounted VHD. This would give an error when the new LabVM was deployed with Server 2016, due to insufficient rights on the target folder.
+
+### v2.1 (13-02-2017)
+
+* New-LabVM
+    * Fixed a bug regarding the default unattend.xml location on GitHub.
+
+### v2.0 (12-02-2017)
+
+Split up NewLabEnvironment into New-NATSwitch and New-LabVM.
+
+* New-NATSwitch
+    * New file, separated from New-LabVM.
+    * No further changes.
+
+* New-LabVM
+    * Removed the NATName-parameter. Parameter is not being used within the script.
+    * Changed URL-parameter to unattendloc-parameter. Since the unattend.xml file can be found both local and on the internet, unattendloc is a better name.
+    * Changed to default location of the unattend.xml file to a directory within the main GitHub module.
+    * Added the DSC-parameter.
+    * Added the DSCPullConfig-parameter.
+    * Added the NestedVirt-parameter.
+    * Removed the SourceXML-parameter, since it was intended for interal use within the module only.
+    * Added and updated Verbose statements. 
+
+### v1.1 (18-01-2017)
+Added the URL-paramter. In the initial release, this was a static link to a central unattend.xml file on GitHub. By default, it still is. But with this URL parameter, users have the possibility to link to their own edited or personalized unattend.xml.
+
+### v1.0 (31-12-2016)
+Initial release, reformated the script(s) to a PowerShell module.
+
+## Issues / Feedback
+For any issues or feedback related to this module, please register for GitHub, and post your inquiry to this project's issue tracker.
+
 ## Functions
 
 * **New-NATSwitch** creates a Internal Virtual Switch within Hyper-V and gives the switch an IP-address & subnet. Creates a NAT network for the IP-range of the Internal Virtual Switch.
@@ -247,42 +292,3 @@ This module is extending the script I first used for my Experts Live 2016 sessio
  
  DscMetaConfigs @Params
  ```
- 
-## Versions
-
-### v2.2 (08-03-2017)
-
-* New-LabVM
-    * Fixed a bug regarding copying the metamof file to the mounted VHD. This would give an error when the new LabVM was deployed with Server 2016, due to insufficient rights on the target folder.
-
-### v2.1 (13-02-2017)
-
-* New-LabVM
-    * Fixed a bug regarding the default unattend.xml location on GitHub.
-
-### v2.0 (12-02-2017)
-
-Split up NewLabEnvironment into New-NATSwitch and New-LabVM.
-
-* New-NATSwitch
-    * New file, separated from New-LabVM.
-    * No further changes.
-
-* New-LabVM
-    * Removed the NATName-parameter. Parameter is not being used within the script.
-    * Changed URL-parameter to unattendloc-parameter. Since the unattend.xml file can be found both local and on the internet, unattendloc is a better name.
-    * Changed to default location of the unattend.xml file to a directory within the main GitHub module.
-    * Added the DSC-parameter.
-    * Added the DSCPullConfig-parameter.
-    * Added the NestedVirt-parameter.
-    * Removed the SourceXML-parameter, since it was intended for interal use within the module only.
-    * Added and updated Verbose statements. 
-
-### v1.1 (18-01-2017)
-Added the URL-paramter. In the initial release, this was a static link to a central unattend.xml file on GitHub. By default, it still is. But with this URL parameter, users have the possibility to link to their own edited or personalized unattend.xml.
-
-### v1.0 (31-12-2016)
-Initial release, reformated the script(s) to a PowerShell module.
-
-## Issues / Feedback
-For any issues or feedback related to this module, please register for GitHub, and post your inquiry to this project's issue tracker.

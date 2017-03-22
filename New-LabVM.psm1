@@ -1,4 +1,4 @@
-﻿# Version 2.2 (08-03-2017)
+﻿# Version 2.3 (22-03-2017)
 
 <#
     .Synopsis
@@ -33,7 +33,7 @@ function New-LabVM
     [string]$VMName,
     
     [Parameter(Mandatory = $false)]
-    [string]$MemoryStartupBytes = 2048MB,
+    [int64]$MemoryStartupBytes = 2048MB,
         
     [Parameter(Mandatory = $true)]
     [string]$VMIP,
@@ -133,9 +133,13 @@ function New-LabVM
       Invoke-Expression -Command '.\DSCPullConfig.ps1'
              
       $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
-      $destdir = "${VHD}:\Windows\system32\Configuration"
       $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
-      takeown.exe /F $destdir
+      
+      $acl = get-acl "${VHD}:\windows\System32\Configuration"
+      $user = whoami
+      $ar = New-Object System.Security.AccessControl.FileSystemAccessRule($user,"FullControl","Allow")
+      $acl.SetAccessRule($ar)
+      
       Copy-Item -Path $sourcemof -Destination $destmof -Force
 
       Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
