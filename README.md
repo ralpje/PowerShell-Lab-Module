@@ -5,7 +5,7 @@ This module is extending the script I first used for my Experts Live 2016 sessio
 
 ## Versions
 
-## V2.3 (22-03-2017)
+### V2.3 (22-03-2017)
 
 * New-LabVM
     * Fixed a bug regarding MemoryStartupBytes. Input type is `int64` instead of `string`.
