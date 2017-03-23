@@ -20,7 +20,7 @@ Install-Module -Name Pester -Repository PSGallery -Force
 # Install PSScriptAnalyzer        # 
 #---------------------------------# 
 Write-Host 'Installing PSScriptAnalyzer'
-Install-Module PSScriptAnalyzer -Repository PSGallery
+Install-Module PSScriptAnalyzer -Repository PSGallery -Force
 
 #---------------------------------# 
 # Install Hyper-V & PoSH Mods     # 
