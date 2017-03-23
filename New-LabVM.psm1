@@ -25,7 +25,9 @@
 #>
 function New-LabVM
 {
-  [CmdletBinding()]
+  [CmdletBinding(
+    SupportsShouldProcess = $true
+  )]
   [OutputType([String])]
   Param
   ( 

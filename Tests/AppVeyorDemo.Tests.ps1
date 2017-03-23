@@ -38,19 +38,19 @@ if ($Scripts.count -gt 0) {
 # Custom Pester tests (replace)   # 
 #---------------------------------# 
 
-$PSVersion    = $PSVersionTable.PSVersion.Major
-$AppVeyorDemo = "$PSScriptRoot\..\AppVeyorDemo.psm1"
+#$PSVersion    = $PSVersionTable.PSVersion.Major
+#$AppVeyorDemo = "$PSScriptRoot\..\AppVeyorDemo.psm1"
 
-Describe "AppVeyorDemo PS$PSVersion" {
-    Copy-Item $AppVeyorDemo TestDrive:\script.ps1 -Force
-    Mock Export-ModuleMember {return $true}
-    . 'TestDrive:\script.ps1'
-    
-    Context 'Strict mode' { 
-        Set-StrictMode -Version latest
-
-        It 'Get-SomeInt should return int' {
-          Get-SomeInt | Should BeOfType System.Int32
-        }     
-    }
-}
+#Describe "AppVeyorDemo PS$PSVersion" {
+#    Copy-Item $AppVeyorDemo TestDrive:\script.ps1 -Force
+#    Mock Export-ModuleMember {return $true}
+#    . 'TestDrive:\script.ps1'
+#   
+#    Context 'Strict mode' { 
+#        Set-StrictMode -Version latest
+#
+#        It 'Get-SomeInt should return int' {
+#          Get-SomeInt | Should BeOfType System.Int32
+#        }     
+#    }
+#}
