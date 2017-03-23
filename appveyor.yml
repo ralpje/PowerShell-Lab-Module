@@ -1,16 +1,16 @@
 #---------------------------------# 
 #      environment configuration  # 
 #---------------------------------# 
-version: 1.0.{build}
+version: 2.3.{build}
 os: WMF 5
 install:
   - ps: . .\AppVeyor\AppVeyorInstall.ps1
 
-environment:
-  MySecureVar:
-    secure: 2miEAGV72ED32TvZbXUbQA== #This is secured
-  MyNonSecureVar: NonSecure
-  ModuleName: appVeyorDemo
+# environment:
+#  MySecureVar:
+#    secure: 2miEAGV72ED32TvZbXUbQA== #This is secured
+#  MyNonSecureVar: NonSecure
+#  ModuleName: appVeyorDemo
 #---------------------------------# 
 #      build configuration        # 
 #---------------------------------# 
