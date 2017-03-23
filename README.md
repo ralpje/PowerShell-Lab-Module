@@ -1,5 +1,3 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/5ojdq1k6ho3vddny?svg=true)](https://ci.appveyor.com/project/svenvanrijen/powershell-lab-module)
-
 # PowerShell-Lab-Module
 A Powershell module for (re)building your (home) lab environment on Hyper-V
 
