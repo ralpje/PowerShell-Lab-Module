@@ -102,7 +102,3 @@
      ActionAfterReboot = 'ContinueConfiguration';
      ReportOnly = $False;  # Set to $True to have machines only report to AA DSC but not pull from it
  }
-
- # Use PowerShell splatting to pass parameters to the DSC configuration being invoked
- # For more info about splatting, run: Get-Help -Name about_Splatting
- DscMetaConfigs @Params

@@ -1,4 +1,4 @@
-﻿# Version 2.3 (22-03-2017)
+﻿# Version 2.4 (27-03-2017)
 
 <#
     .Synopsis
@@ -87,12 +87,19 @@ function New-LabVM
   
     #region copy adjusted answer file
     # mount VHD
-    $VHD = (Mount-VHD -Path $maindiskpath -Passthru |
-      Get-Disk |
+    $VHD = Mount-VHD -Path $maindiskpath -Passthru
+
+    $x = Get-Disk $vhd.Number |
       Get-Partition |
       Where-Object -FilterScript {
         $_.Type -eq 'Basic'
-    }).DriveLetter
+    }
+
+    Get-Disk $vhd.Number | Set-Disk -IsOffline $false
+
+    Set-Partition -PartitionNumber $x.PartitionNumber -NewDriveLetter T -DiskNumber $x.DiskNumber -ErrorAction SilentlyContinue 
+
+    New-PSDrive -Name T -Root t:\ -PSProvider FileSystem | Out-Null
     
     Write-Verbose -Message 'Differencing disk mounted'
     
@@ -115,7 +122,7 @@ function New-LabVM
     $Unattend.unattend.settings[1].component[3].Interfaces.Interface.UnicastIpAddresses.IpAddress.'#text' = $VMIP
     $Unattend.unattend.settings[1].component[4].Interfaces.Interface.DNSServerSearchOrder.IpAddress.'#Text' = $DNSIP
     $Unattend.unattend.settings[1].component[3].Interfaces.Interface.Routes.Route.NextHopAddress = $GWIP
-    $Unattend.Save("${VHD}:\\Unattend.xml")
+    $Unattend.Save("T:\\Unattend.xml")
     
     Write-Verbose -Message "Set VM name to $VMName, IP Address to $VMIP, DNS IP to $DNSIP and GW IP to $GWIP"    
     
@@ -132,21 +139,16 @@ function New-LabVM
       (Get-Content -Path '.\DSCPullConfig.ps1') -replace '\breplace\b', "$VMName" | Out-File -FilePath '.\DSCPullConfig.ps1'
         
       #Kick off DSC Pull Config to generate metamof
-      Invoke-Expression -Command '.\DSCPullConfig.ps1'
+      . '.\DSCPullConfig.ps1'
+      DscMetaConfigs @Params
              
       $sourcemof = "$PSScriptRoot\temp\DscMetaConfigs\$VMName.meta.mof"
-      $destmof = "${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
-      
-      $acl = get-acl "${VHD}:\windows\System32\Configuration"
-      $user = whoami
-      $ar = New-Object System.Security.AccessControl.FileSystemAccessRule($user,"FullControl","Allow")
-      $acl.SetAccessRule($ar)
-      
-      Copy-Item -Path $sourcemof -Destination $destmof -Force
+      $destmof = "T:\Windows\system32\Configuration\MetaConfig.mof"
+      Move-Item -Path $sourcemof -Destination $destmof -Force
 
-      Write-Verbose -Message "Copied metaconfig.mof to ${VHD}:\Windows\system32\Configuration\MetaConfig.mof"
+      Write-Verbose -Message "Copied metaconfig.mof to T:\Windows\system32\Configuration\MetaConfig.mof"
       
-      reg.exe load HKLM\Vhd ${VHD}:\Windows\System32\Config\Software
+      reg.exe load HKLM\Vhd T:\Windows\System32\Config\Software
       Set-Location -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies
       Set-ItemProperty -Path . -Name DSCAutomationHostEnabled -Value 2
       [gc]::Collect()

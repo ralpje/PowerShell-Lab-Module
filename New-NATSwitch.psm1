@@ -30,7 +30,8 @@
 #>
 function New-NATSwitch
 {
-  [CmdletBinding()]
+  [CmdletBinding(
+    SupportsShouldProcess = $true)]
   [OutputType([String])]
   Param
   ( 

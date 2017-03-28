@@ -5,6 +5,20 @@ This module is extending the script I first used for my Experts Live 2016 sessio
 
 ## Versions
 
+### V2.4 (27-03-2017)
+
+* General changes
+    * Added PSScriptAnalyzer Pester tests
+    * Hooked the module into the online  CI tool 'AppVeyor'
+
+* New-NATSwitch
+    * Added SupportsShouldProcess = $true
+
+* New-LabVM
+    * SupportsShouldProcess = $true
+    * Removed bugfix from V2.3, fix still didn't work out.
+    * Changed the way .vhdx is mounted and drive letter is assigned to finaly fix the bug regarding copying the metamof file to the mounted VHD
+
 ### V2.3 (22-03-2017)
 
 * New-LabVM
